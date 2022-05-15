@@ -126,3 +126,10 @@ let loadModule path =
     let content = System.IO.File.ReadAllText path
     parseModule path content
 
+
+let loadModule' =
+    loadModule >> function
+        | Success (x, _, _) -> x
+        | Failure _ as x -> failwithf "%A" x
+
+        

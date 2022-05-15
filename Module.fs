@@ -17,3 +17,52 @@ type Scene = Scene of labelName: string * labelDisplayName: string option * comm
 type Module = Module of header: Line list * Scene list
 
 
+type CommandDeclaretion = 
+    { Command: string 
+      Params: string list }
+
+
+let commandDeclaretions m =
+    let genParams (command: Command) =
+        command.Args |> List.map fst |> set
+
+    let addDecl (declaretions: Map<string, Set<string>>) (command) =
+        let decl = genParams command
+        match Map.tryFind command.Command declaretions with
+        | None -> Map.add command.Command decl declaretions
+        | Some x -> 
+            Map.add command.Command (Set.union x decl) declaretions
+
+    let addDecl' decls = 
+        function
+        | Command cmd -> addDecl decls cmd
+        | _ -> decls
+
+    let addDecl'' decls (Line (_, e, _)) =
+        List.fold addDecl' decls e
+        
+    let addDecl''' decls (Scene (_, _, _, e)) =
+        List.fold addDecl'' decls e
+
+    let addDecl'''' decl (Module (header, scenes)) =        
+        List.fold addDecl''' (List.fold addDecl'' decl header) scenes
+
+    let decls = List.fold addDecl'''' Map.empty
+
+    decls m
+    |> Map.toSeq
+    |> Seq.map (fun (k, v) -> 
+        { Command = k; Params = Set.toList v })
+    |> Seq.toList
+
+
+let printDeclaretions =
+    List.iter (fun x -> 
+        printfn "%s %A" x.Command x.Params)
+
+
+let sceneNames (Module (_, scenes)) = 
+    scenes 
+    |> List.map (fun (Scene (labelName, labelDisplayName, _, _)) -> 
+        labelName, labelDisplayName)
+            
