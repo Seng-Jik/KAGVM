@@ -26,3 +26,5 @@ let testSingleFile failDetails file =
             System.Console.ResetColor ()
 
 
+commandToYukimiScript ["file"] { Command = "bg"; Args = ["file", Some "a.png"; "fade", None; "time", Some "123"]}
+|> printfn "%s"

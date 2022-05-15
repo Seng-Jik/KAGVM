@@ -6,6 +6,23 @@ type Command =
     Args: (string * string option) list }
 
 
+let commandToYukimiScript wrappedArgs c =
+    "@" + c.Command + 
+    begin
+        List.fold 
+            (fun s (x, n) -> 
+                let argName = " --" + x
+                let wrap = 
+                    if List.exists ((=) x) wrappedArgs
+                    then "\""
+                    else ""
+                let argValue = Option.map (fun x -> " " + wrap + x + wrap) n
+                s + argName + Option.defaultValue "" argValue)
+            "" 
+            c.Args
+    end
+
+
 type Element = 
     | TextPiece of string
     | Command of Command

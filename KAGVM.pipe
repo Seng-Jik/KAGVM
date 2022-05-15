@@ -1,0 +1,14 @@
+
+- task Build-KAGVM %submodule-path%
+for %i% in (get-files %submodule-path%) {
+    if (ends-with ".fs" %i%) {
+        input "%submodule-path%/%i%"
+    }
+}
+
+input "%submodule-path%/KAGVM.fsproj"
+output "%submodule-path%/bin/Release/net6.0/publish/KAGVM.dll"
+
+- operation Build-KAGVM %submodule-path%
+dotnet publish "%submodule-path%/KAGVM.fsproj" -c Release
+
