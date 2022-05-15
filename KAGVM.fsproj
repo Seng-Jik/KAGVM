@@ -4,8 +4,9 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Test.fsx" />
+    <Compile Include="Module.fs" />
     <Compile Include="Parser.fs" />
+    <Compile Include="Test.fsx" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FParsec" Version="1.1.1" />

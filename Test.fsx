@@ -1,4 +1,5 @@
 #r "nuget: FParsec"
+#load "Module.fs"
 #load "Parser.fs"
 
 open FParsec.CharParsers
@@ -7,9 +8,8 @@ open KAGVM.Parser
 
 
 let testSingleFile failDetails file =
-    let content = System.IO.File.ReadAllText file
     printf "%s..." file
-    match runParserOnString document () file content with
+    match loadModule file with
     | Success _ -> 
         System.Console.ForegroundColor <- System.ConsoleColor.Green
         printfn "OK!"

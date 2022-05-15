@@ -2,6 +2,7 @@
 
 open FParsec.CharParsers
 open FParsec.Primitives
+open Module
 
 
 let comment: Parser<string, unit> = 
@@ -22,15 +23,14 @@ let labelName: Parser<_, unit> =
         satisfy (fun x -> x <> '\n' && x <> '\r' && x <> '|')
 
 
-let label: Parser<string * string option, unit> =
+let label: Parser<string * string option * string option, unit> =
+    let displayName = 
+        manyCharsTillApply anyChar lineEnd (fun displayName comment -> 
+            Some displayName, comment)
     tuple2 (pchar '*' >>. (opt labelName |>> Option.defaultValue ""))
-           (pchar '|' >>. (manyCharsTill anyChar lineEnd |>> Some) <|> (lineEnd) |>> fun _ -> None)
+           (pchar '|' >>. displayName <|> (lineEnd |>> fun comment -> None, comment))
+    |>> fun (a, (b, c)) -> a, b, c
     <?> "lable"
-
-
-type Value = 
-    | Symbol of string
-    | String of string
 
 
 let stringLiteral =
@@ -51,9 +51,9 @@ module Value =
     let string': Parser<_, unit> = stringLiteral <?> "string"
 
 
-let value: Parser<Value, _> = 
-    choice <| List.map attempt [ Value.string' |>> String 
-                                 Value.symbol |>> Symbol ]
+let value: Parser<string, _> = 
+    choice <| List.map attempt [ Value.string' 
+                                 Value.symbol ]
     <?> "value"
 
 
@@ -62,11 +62,6 @@ let argName = identifier <|> pstring "*"
 
 let argument = tuple2 (argName <?> "argName") (opt (pstring "=" >>. value)) 
                <?> "argument"
-
-
-type Command = 
-  { Command: string
-    Args: (string * Value option) list }
 
 
 let ws, ws1 = 
@@ -94,15 +89,6 @@ let textPiece: Parser<_, unit> =
     <?> "text piece"
 
 
-type Element = 
-    | TextPiece of string
-    | Command of Command
-    | Tjs of string
-
-
-type Line = Line of lineNumber: int64 * elements: Element list * comment: string option
-
-            
 let tjs: Parser<string, unit> = 
     pstring "[iscript]" >>. manyCharsTill anyChar (pstring "[endscript]") <?> "Tjs"
 
@@ -121,13 +107,22 @@ let bodyLine =
     <?> "body line"
 
 
-type Scene = Scene of labelName: string * labelDisplayName: string option * Line list
-
-
 let scene =
     tuple2 label (many bodyLine)
-    |>> fun ((a, b), c) -> Scene (a, b, c)
+    |>> fun ((a, b, c), d) -> Scene (a, b, c, d)
     <?> "scene"
 
 
-let document = (many bodyLine) .>>. many scene <?> "document"
+let kagModule = 
+    (many bodyLine) .>>. many scene <?> "module"
+    |>> Module
+
+
+let parseModule name content =
+    runParserOnString kagModule () name content
+
+
+let loadModule path = 
+    let content = System.IO.File.ReadAllText path
+    parseModule path content
+
