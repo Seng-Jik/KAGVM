@@ -5,6 +5,7 @@
 open FParsec.CharParsers
 open FParsec.Primitives
 open KAGVM.Parser
+open KAGVM.Module
 
 
 let testSingleFile failDetails file =
@@ -24,16 +25,4 @@ let testSingleFile failDetails file =
             printfn "Failed!"
             System.Console.ResetColor ()
 
-
-let testAll () =
-    []
-    |> Seq.collect (System.IO.Directory.GetFiles)
-    |> Seq.filter (fun x -> x.ToLower().EndsWith ".ks")
-    |> Seq.iter (testSingleFile false)
-
-
-let test = testSingleFile true
-
-
-testAll()
 
