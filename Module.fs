@@ -6,6 +6,15 @@ type Command =
     Args: (string * string option) list }
 
 
+let arg argName { Command = _; Args = a } = 
+    List.tryFind (fst >> (=) argName) a 
+    |> Option.map snd
+    |> Option.flatten
+
+
+let arg' argName cmd = (arg argName cmd).Value
+
+
 let commandToYukimiScript wrappedArgs c =
     "@" + c.Command + 
     begin
