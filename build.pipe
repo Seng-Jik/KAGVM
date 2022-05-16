@@ -1,4 +1,4 @@
 - include "KAGVM.pipe"
 
 - action build
-Build-KAGVM "."
+Build-KAGVM
