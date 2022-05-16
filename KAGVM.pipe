@@ -12,3 +12,13 @@ output "./bin/Release/net6.0/publish/KAGVM.dll"
 - operation Build-KAGVM
 dotnet publish "./KAGVM.fsproj" -c Release
 
+- task Clean-KAGVM
+dirty
+
+- operation Clean-KAGVM
+if (dir-exists "bin") {
+    delete-dir "bin"
+}
+if (dir-exists "obj") {
+    delete-dir "obj"
+}
