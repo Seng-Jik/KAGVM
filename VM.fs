@@ -34,6 +34,9 @@ module CommandDispatcher =
     type CommandHandler<'state> = CommandDispatcherState -> Command -> 'state -> 'state
 
 
+    let pass: CommandHandler<'a> = fun _ _ -> id
+
+
     let dispatchCommands (commands: Map<string, CommandHandler<'state'>>) =
         fun modu scene line (cmd: Command) state ->
             match Map.tryFind cmd.Command commands with
