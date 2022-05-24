@@ -37,7 +37,10 @@ let testScript parser str =
 let testParse = testScript kagModule
 
 
-testScript kagModule """@abc a=1 b=2;测试
-[a]
-[b]"""
+testScript kagModule """@e
+@iscript
+	f['route'][0]=1;
+	sf['route'][0]=1;
+	sf['h_scene'][1]++;
+@endscript"""
 

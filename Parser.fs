@@ -70,7 +70,7 @@ let argument = tuple2 (argName <?> "argName") (ws >>. opt (pstring "=" >>. ws >>
                <?> "argument"
 
 
-let commandName: Parser<_, unit> = many1Chars <| satisfy (fun x -> x <> ' ' && x <> ']' && x <> ';')
+let commandName: Parser<_, unit> = many1Chars <| satisfy (fun x -> x <> ' ' && x <> ']' && x <> ';' && x <> '\n' && x <> '\r')
 
 
 let arguments = sepBy1 argument ws1 <?> "arguments"
