@@ -70,11 +70,11 @@ let argument = tuple2 (argName <?> "argName") (ws >>. opt (pstring "=" >>. ws >>
                <?> "argument"
 
 
-let commandName: Parser<_, unit> = many1Chars <| satisfy (fun x -> x <> ' ' && x <> ']')
+let commandName: Parser<_, unit> = many1Chars <| satisfy (fun x -> x <> ' ' && x <> ']' && x <> ';')
 
 
 let arguments = sepBy1 argument ws1 <?> "arguments"
-let command = tuple2 commandName (opt (ws1 >>. arguments)) <?> "command" 
+let command = tuple2 commandName (opt <| attempt (ws1 >>. arguments)) <?> "command" 
               |>> fun (c: _, a: _) -> { Command = c; Args = Option.defaultValue [] a }
 
 
@@ -90,7 +90,10 @@ let textPiece: Parser<_, unit> =
 
 
 let tjs: Parser<string, unit> = 
-    pstring "[iscript]" >>. manyCharsTill anyChar (pstring "[endscript]") <?> "Tjs"
+    (pstring "[iscript]" >>. manyCharsTill anyChar (pstring "[endscript]"))
+    <|> ((pstring "@iscript" >>. manyCharsTill anyChar (pstring "@enscript")))
+    <?> "Tjs"
+    
 
 
 let bodyLine = 
@@ -98,7 +101,7 @@ let bodyLine =
     (getPosition |>> fun pos -> pos.Line) .>>.
     begin
         [ tjs |>> Tjs |>> List.singleton
-          lineCommand |>> Command |>> List.singleton
+          lineCommand |>> Command |>> List.singleton .>> ws
           many ((inlineCommand |>> Command) <|> (textPiece |>> TextPiece)) ]
         |> choice
         .>>. lineEnd

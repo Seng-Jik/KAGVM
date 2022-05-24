@@ -26,5 +26,18 @@ let testSingleFile failDetails file =
             System.Console.ResetColor ()
 
 
-commandToYukimiScript ["file"] { Command = "bg"; Args = ["file", Some "a.png"; "fade", None; "time", Some "123"]}
-|> printfn "%s"
+let testScript parser str = 
+    match run parser str with
+    | Success (x, _, _) ->
+        printfn "%A" x
+    | err ->
+        printfn "%A" err
+
+
+let testParse = testScript kagModule
+
+
+testScript kagModule """@abc a=1 b=2;测试
+[a]
+[b]"""
+
