@@ -91,7 +91,7 @@ let textPiece: Parser<_, unit> =
 
 let tjs: Parser<string, unit> = 
     (pstring "[iscript]" >>. manyCharsTill anyChar (pstring "[endscript]"))
-    <|> ((pstring "@iscript" >>. manyCharsTill anyChar (pstring "@enscript")))
+    <|> ((pstring "@iscript" >>. manyCharsTill anyChar (pstring "@endscript")))
     <?> "Tjs"
     
 
