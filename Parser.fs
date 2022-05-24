@@ -60,14 +60,14 @@ let value: Parser<string, _> =
 let argName = identifier <|> pstring "*"
 
 
-let argument = tuple2 (argName <?> "argName") (opt (pstring "=" >>. value)) 
-               <?> "argument"
-
-
 let ws, ws1 = 
     let s = pchar ' ' <|> pchar '\t'
     many s |>> ignore,
     many1 s |>> ignore
+
+
+let argument = tuple2 (argName <?> "argName") (ws >>. opt (pstring "=" >>. ws >>. value)) 
+               <?> "argument"
 
 
 let commandName: Parser<_, unit> = many1Chars <| satisfy (fun x -> x <> ' ' && x <> ']')
