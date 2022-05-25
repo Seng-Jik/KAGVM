@@ -1,4 +1,4 @@
-namespace Utils
+namespace KAGVM.Utils
 
 open System.Collections
 open System.Collections.Generic
