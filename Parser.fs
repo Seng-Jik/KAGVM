@@ -66,7 +66,7 @@ let ws, ws1 =
     many1 s |>> ignore
 
 
-let argument = tuple2 (argName <?> "argName") (ws >>. opt (pstring "=" >>. ws >>. value)) 
+let argument = tuple2 (argName <?> "argName") (opt <| attempt (ws >>. pstring "=" >>. ws >>. value)) 
                <?> "argument"
 
 
